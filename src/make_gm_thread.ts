@@ -1,15 +1,17 @@
-import { ChannelType, TextChannel, SlashCommandBuilder, Interaction } from 'discord.js'
+import { ChannelType, TextChannel, SlashCommandBuilder, SlashCommandUserOption, Interaction } from 'discord.js'
 
-const optionSetName = (name: string) => (option: SlashCommandBuilder) => option.setName(name);
-const optionSetDescription = (description: string) => (option: SlashCommandBuilder) => option.setDescription(description);
+type OptionSetter = ((option: SlashCommandUserOption) => SlashCommandUserOption);
 
-const composeSetter = (...setters: any[]) =>
+const optionSetName = (name: string) => (option: SlashCommandUserOption) => option.setName(name);
+const optionSetDescription = (description: string) => (option: SlashCommandUserOption) => option.setDescription(description);
+
+const composeSetter = (...setters: OptionSetter[]) =>
     setters.reduce((acc, setter) =>
-        (option: SlashCommandBuilder) => {
+        (option: SlashCommandUserOption) => {
             const modified = acc(option);
             return setter(modified);
         },
-        (option: SlashCommandBuilder) => option
+        (option: SlashCommandUserOption) => option
     )
 
 const userNameN = (n: number) => optionSetName(`username${n}`);
